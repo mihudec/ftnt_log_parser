@@ -113,21 +113,26 @@ class Cli(object):
         parser = self._common_parser
         parser.add_argument('--index', dest='elasticsearch_index', required=True)
         parser.add_argument('--pipeline', dest='elasticsearch_pipeline', required=False, help="Name of the Ingest Pipeline")
+        parser.add_argument('--id-key', dest='id_key', required=False, help="Key to use for Elastic _id field", default=None)
         parser.add_argument('--head', dest='head', required=False, default=None, type=int, help="Number of HEAD lines to index")
         parser.add_argument('--enrich', dest='enrich', nargs='*', action=ParseKwargs, default=dict())
+
         parser.description = "Read the logfile and send to Elasticsearch"
         parser.usage = "flp index [<args>]"
         args = parser.parse_args(sys.argv[2:])
         self.CONFIG = get_config(args=sys.argv)
         input_files = args.input_files
+        print(self.CONFIG)
 
         es_client = Elasticsearch(
             hosts=self.CONFIG.elasticsearch.url,
             basic_auth=(self.CONFIG.elasticsearch.username, self.CONFIG.elasticsearch.password),
             ca_certs=self.CONFIG.elasticsearch.ca_cert
         )
-        
-        ei = ElasticIndexer(client=es_client, index_name=args.elasticsearch_index, pipeline=args.elasticsearch_pipeline, id_key='msg_id')
+        id_key = "msg_id"
+        if args.id_key is not None:
+            id_key = args.id_key
+        ei = ElasticIndexer(client=es_client, index_name=args.elasticsearch_index, pipeline=args.elasticsearch_pipeline, id_key=id_key)
         total_records = 0
         for input_file in input_files:
             total_records = LogLoader.get_size(file=input_file)

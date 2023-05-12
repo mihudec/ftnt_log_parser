@@ -3,6 +3,7 @@ import timeit
 import datetime
 from typing import Iterable, Dict
 from elasticsearch import Elasticsearch
+from elastic_transport import ObjectApiResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -29,6 +30,10 @@ class ElasticIndexer:
             event_id = doc.get(self.id_key, None)
             # TODO: Fix event_id to be more unique
         res = self.client.index(index=self.index_name, document=doc, id=event_id, pipeline=self.pipeline)
+        if not isinstance(res, ObjectApiResponse):
+            print(f"Error: {res}")
+
+                
 
 
     def progress_callback(self, future):
@@ -60,3 +65,4 @@ class ElasticIndexer:
             except Exception as e:
                 executor.shutdown(wait=False, cancel_futures=True)
                 print(repr(e))
+        self.reset()

@@ -36,7 +36,11 @@ class LogLoader:
     def read_gzip(file: pathlib.Path) -> Generator[str, None, None]:
         with gzip.open(file) as f:
             for line in f:
-                yield line.decode(encoding='utf-8').strip()
+                try:
+                    yield line.decode(encoding='utf-8').strip()
+                except UnicodeDecodeError as e:
+                    print(f"Failed to decode line as UTF-8. Line: {line}, Exception: {repr(e)}")
+
 
     @staticmethod
     def read_tar(file: pathlib.Path) -> Generator[str, None, None]:
@@ -45,7 +49,10 @@ class LogLoader:
             f = tar.extractfile(member)
             if f is not None:
                 for line in f:
-                    yield line.decode(encoding='utf-8').strip()
+                    try:
+                        yield line.decode(encoding='utf-8').strip()
+                    except UnicodeDecodeError as e:
+                        print(f"Failed to decode line as UTF-8. Line: {line}, Exception: {repr(e)}")
 
     @staticmethod
     def determine_filetype(file: pathlib.Path) -> Literal['plain', 'gz', 'tgz']:

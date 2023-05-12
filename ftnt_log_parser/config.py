@@ -69,6 +69,7 @@ class FLPElasticConfig(FLPConfigBase):
     ca_cert: Optional[FilePath]
     index: Optional[str]
     pipeline: Optional[str]
+    id_key: Optional[str]
 
 class FLPConfig(FLPConfigBase):
 
