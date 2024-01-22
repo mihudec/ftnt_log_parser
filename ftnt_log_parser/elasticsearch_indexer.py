@@ -30,8 +30,10 @@ class ElasticIndexer:
             event_id = doc.get(self.id_key, None)
             # TODO: Fix event_id to be more unique
         res = self.client.index(index=self.index_name, document=doc, id=event_id, pipeline=self.pipeline)
+        # print(res)
         if not isinstance(res, ObjectApiResponse):
             print(f"Error: {res}")
+        return res
 
                 
 
@@ -46,6 +48,13 @@ class ElasticIndexer:
             average_time = elapsed_time / self.counter
             estimated_remaining = (self.total_records - self.counter) * average_time
             print(f"Indexed: {self.counter} of {self.total_records} ({(self.counter/self.total_records)*100} %)\nElapsed Time: {datetime.timedelta(seconds=elapsed_time)}\nAverage Time: {average_time} s\nEstimated Remaining {datetime.timedelta(seconds=estimated_remaining)}\n")
+
+        if hasattr(future, 'exception') and future.exception():
+            print(f"Error during indexing: {repr(future.exception())}")
+
+        # Print the response regardless of whether it's an ObjectApiResponse
+        res = future.result()
+        # print(f"Response: {res}")
 
         self.counter_lock.release()
 

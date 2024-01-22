@@ -127,7 +127,9 @@ class Cli(object):
         es_client = Elasticsearch(
             hosts=self.CONFIG.elasticsearch.url,
             basic_auth=(self.CONFIG.elasticsearch.username, self.CONFIG.elasticsearch.password),
-            ca_certs=self.CONFIG.elasticsearch.ca_cert
+            ca_certs=self.CONFIG.elasticsearch.ca_cert,
+            verify_certs=False,
+            ssl_show_warn=False
         )
         id_key = "msg_id"
         if args.id_key is not None:
