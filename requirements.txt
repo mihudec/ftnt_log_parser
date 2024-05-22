@@ -1,4 +1,4 @@
-pyyaml
-pandas
-pydantic
-elasticsearch
+PyYAML==6.0
+pandas==2.0.2
+pydantic==1.10.9
+elasticsearch==8.8.0
